@@ -115,7 +115,7 @@
                         android:layout_marginLeft="5dp"
                         android:background="@null"
                         android:gravity="center_horizontal"
-                        android:text="Nam"
+                        android:text="Name"
                         android:textColor="@color/Black"
                         android:textSize="20sp" />
 
