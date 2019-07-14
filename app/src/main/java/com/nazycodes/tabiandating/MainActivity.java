@@ -1,5 +1,6 @@
 package com.nazycodes.tabiandating;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -9,20 +10,35 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.MenuItem;
 
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.nazycodes.tabiandating.models.Message;
 import com.nazycodes.tabiandating.models.User;
 import com.nazycodes.tabiandating.util.PreferenceKeys;
 
-public class MainActivity extends AppCompatActivity implements IMainActivity{
+public class MainActivity extends AppCompatActivity implements IMainActivity, BottomNavigationViewEx.OnNavigationItemSelectedListener{
 
     private static final String TAG = "MainActivity";
+
+    //widgets
+    private BottomNavigationViewEx mBottomNavigationViewEx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mBottomNavigationViewEx = findViewById(R.id.bottom_nav_view);
+
+        mBottomNavigationViewEx.setOnNavigationItemSelectedListener(this);
         isFirstLogin();
+        initBottomNavigationView();
         init();
+    }
+
+    private void initBottomNavigationView(){
+        Log.d(TAG, "initBottomNavigationView: initializing the bottom navigation view");
+        mBottomNavigationViewEx.enableAnimation(false);
     }
 
     private void init(){
@@ -51,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity{
 
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(PreferenceKeys.FIRST_TIME_LOGIN, false);
-                    editor.commit();
+                    editor.apply();
                     dialog.dismiss();
                 }
             });
@@ -76,5 +92,62 @@ public class MainActivity extends AppCompatActivity implements IMainActivity{
         transaction.replace(R.id.main_content_frame, fragment, getString(R.string.tag_fragment_view_profile));
         transaction.addToBackStack(getString(R.string.tag_fragment_view_profile));
         transaction.commit();
+    }
+
+    @Override
+    public void onMessageSelected(Message message) {
+        ChatFragment fragment = new ChatFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable(getString(R.string.intent_message), message);
+        fragment.setArguments(args);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main_content_frame, fragment, getString(R.string.tag_fragment_chat));
+        transaction.addToBackStack(getString(R.string.tag_fragment_chat));
+        transaction.commit();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+        switch (menuItem.getItemId()){
+
+            case R.id.bottom_nav_home: {
+                Log.d(TAG, "onNavigationItemSelected: HomeFragment");
+                HomeFragment homeFragment = new HomeFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.main_content_frame, homeFragment, getString(R.string.tag_fragment_home));
+                transaction.addToBackStack(getString(R.string.tag_fragment_home));
+                transaction.commit();
+                menuItem.setChecked(true);
+                break;
+            }
+
+            case R.id.bottom_nav_connections: {
+                Log.d(TAG, "onNavigationItemSelected: ConnectionsFragment");
+                SavedConnectionsFragment savedConnectionsFragment = new SavedConnectionsFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.main_content_frame, savedConnectionsFragment, getString(R.string.tag_fragment_saved_connections));
+                transaction.addToBackStack(getString(R.string.tag_fragment_saved_connections));
+                transaction.commit();
+                menuItem.setChecked(true);
+                break;
+            }
+
+            case R.id.bottom_nav_messages: {
+                Log.d(TAG, "onNavigationItemSelected: MessagesFragment");
+                MessagesFragment messagesFragment = new MessagesFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.main_content_frame, messagesFragment, getString(R.string.tag_fragment_messages));
+                transaction.addToBackStack(getString(R.string.tag_fragment_messages));
+                transaction.commit();
+                menuItem.setChecked(true);
+                break;
+            }
+
+        }
+
+        return false;
     }
 }
