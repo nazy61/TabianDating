@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.nazycodes.tabiandating.models.User;
 import com.nazycodes.tabiandating.util.PreferenceKeys;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MessagesFragment extends Fragment {
+public class MessagesFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "MessagesFragment";
 
@@ -32,6 +33,7 @@ public class MessagesFragment extends Fragment {
     private MessagesRecyclerViewAdapter mRecyclerViewAdapter;
     private RecyclerView mRecyclerView;
     private SearchView mSearchView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     //vars
     private ArrayList<User> mUsers = new ArrayList<>();
@@ -43,6 +45,9 @@ public class MessagesFragment extends Fragment {
         Log.d(TAG, "onCreateView: started");
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mSearchView = view.findViewById(R.id.action_search);
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         getConnections();
         initSearchView();
@@ -99,5 +104,16 @@ public class MessagesFragment extends Fragment {
         mRecyclerViewAdapter = new MessagesRecyclerViewAdapter(getActivity(), mUsers);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onRefresh() {
+        getConnections();
+        onItemsLoadComplete();
+    }
+
+    private void onItemsLoadComplete() {
+        mRecyclerViewAdapter.notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 }

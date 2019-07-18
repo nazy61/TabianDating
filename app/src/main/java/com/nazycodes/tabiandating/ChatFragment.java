@@ -120,6 +120,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
         if(view.getId() == R.id.back_arrow){
             Log.d(TAG, "onClick: navigating back");
+            mInterface.onBackPressed();
 
         } else if(view.getId() == R.id.post_message){
             Log.d(TAG, "onClick: posting new message");

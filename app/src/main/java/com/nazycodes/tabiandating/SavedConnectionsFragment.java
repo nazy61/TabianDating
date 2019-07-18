@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.nazycodes.tabiandating.models.User;
 import com.nazycodes.tabiandating.util.PreferenceKeys;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SavedConnectionsFragment extends Fragment {
+public class SavedConnectionsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "SavedConnFragment";
 
     //constants
@@ -31,6 +32,7 @@ public class SavedConnectionsFragment extends Fragment {
     //widgets
     private MainRecyclerViewAdapter mRecyclerViewAdapter;
     private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     //vars
     private ArrayList<User> mUsers = new ArrayList<>();
@@ -42,6 +44,9 @@ public class SavedConnectionsFragment extends Fragment {
         Log.d(TAG, "onCreateView: started");
 
         mRecyclerView = view.findViewById(R.id.recycler_view);
+        mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+
+        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         getConnections();
 
@@ -74,5 +79,16 @@ public class SavedConnectionsFragment extends Fragment {
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_GRID_COLUMNS, LinearLayoutManager.VERTICAL);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+    }
+
+    @Override
+    public void onRefresh() {
+        getConnections();
+        onItemsLoadComplete();
+    }
+
+    private void onItemsLoadComplete(){
+        mRecyclerViewAdapter.notifyDataSetChanged();
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 }

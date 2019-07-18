@@ -18,6 +18,8 @@
         android:layout_height="?attr/actionBarSize"
         android:id="@+id/bottom_nav_view"
         android:layout_alignParentBottom="true"
+        app:itemIconTint="@drawable/blue_onclick_grey"
+        app:itemTextColor="@drawable/blue_onclick_grey"
         app:menu="@menu/bottom_navigation_menu">
         
     </com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx>
