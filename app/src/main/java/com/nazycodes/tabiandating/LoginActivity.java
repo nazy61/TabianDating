@@ -30,10 +30,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(v.getId() == R.id.btn_login){
             Log.d(TAG, "onClick: logging in the user");
 
+            //Need to use LoginActivity.this to access context because we are inside an interface
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             startActivity(intent);
-            finish();
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            finish(); //make sure to finish th activity so it's removed from the activity stack
         }
     }
 }

@@ -75,6 +75,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
         mSendMessage.setOnClickListener(this);
         mRelativeLayoutTop.setOnClickListener(this);
+        mBackArrow.setOnClickListener(this);
 
         initToolbar();
         initRecyclerView();
@@ -140,4 +141,5 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         mFragmentHeading.setText(mMessage.getUser().getName());
         Glide.with(getActivity()).load(mMessage.getUser().getProfile_image()).into(mProfileImage);
     }
+
 }

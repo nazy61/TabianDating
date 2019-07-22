@@ -44,6 +44,7 @@ public class AgreementFragment extends Fragment implements View.OnClickListener 
 
         initToolbar();
         setBackgroundImage(view);
+        mBackArrow.setOnClickListener(this);
 
         return view;
     }

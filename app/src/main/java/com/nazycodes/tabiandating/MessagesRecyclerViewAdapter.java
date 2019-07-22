@@ -62,7 +62,7 @@ public class MessagesRecyclerViewAdapter extends RecyclerView.Adapter<MessagesRe
             public void onClick(View v){
                 Log.d(TAG, "onClick: clicked on: " + user.getName());
 
-                mInterface.onMessageSelected(new Message(mUsers.get(position), Messages.MESSAGES[position]));
+                mInterface.onMessageSelected(new Message(user, Messages.MESSAGES[position]));
             }
         });
     }
@@ -74,7 +74,7 @@ public class MessagesRecyclerViewAdapter extends RecyclerView.Adapter<MessagesRe
             protected FilterResults performFiltering(CharSequence charSequence){
                 String charString = charSequence.toString();
                 if (charString.isEmpty()){
-
+                    mFilteredUsers = mUsers;
                 } else {
                     ArrayList<User> filteredList = new ArrayList<>();
                     for (User row : mUsers){

@@ -44,8 +44,8 @@ public class HomeFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mSwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
-
         findMatches();
+
         return view;
     }
 

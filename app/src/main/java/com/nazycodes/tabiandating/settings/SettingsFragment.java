@@ -2,10 +2,15 @@ package com.nazycodes.tabiandating.settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -57,7 +62,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
             case R.id.gender_spinner:
                 Log.d(TAG, "onItemSelected: selected a gender: " + adapterView.getItemAtPosition(pos));
-                mSelectedGender =(String) adapterView.getItemAtPosition(pos);
+                mSelectedGender = (String) adapterView.getItemAtPosition(pos);
                 break;
 
             case R.id.interested_in_spinner:
@@ -69,7 +74,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                 Log.d(TAG, "onItemSelected: selected a status: " + adapterView.getItemAtPosition(pos));
                 mSelectedStatus =(String) adapterView.getItemAtPosition(pos);
                 break;
-
         }
     }
 
@@ -94,7 +98,9 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
         mProfileImage.setOnClickListener(this);
         mSave.setOnClickListener(this);
+        mBackArrow.setOnClickListener(this);
 
+        checkPermissions();
         setBackgroundImage(view);
         initToolBar();
         getSavedPreferences();
@@ -160,7 +166,63 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
             savePreferences();
         } else if(view.getId() == R.id.profile_image){
             Log.d(TAG, "onClick: opening activity to choose a photo");
+            if(mPermissionsChecked){
+                Intent intent = new Intent(getActivity(), ChoosePhotoActivity.class);
+                startActivityForResult(intent, NEW_PHOTO_REQUEST);
+            } else {
+                checkPermissions();
+            }
 
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: called");
+
+        if(requestCode == NEW_PHOTO_REQUEST){
+            Log.d(TAG, "onActivityResult: received an activity result from photo request");
+            if(data != null){
+                if(data.hasExtra(getString(R.string.intent_new_gallery_photo))){
+                    Glide.with(this)
+                            .load(data.getStringExtra(getString(R.string.intent_new_gallery_photo)))
+                            .into(mProfileImage);
+                    mSelectedImageUrl = data.getStringExtra(getString(R.string.intent_new_gallery_photo));
+                } else if(data.hasExtra(getString(R.string.intent_new_camera_photo))){
+                    Glide.with(this)
+                            .load(data.getStringExtra(getString(R.string.intent_new_camera_photo)))
+                            .into(mProfileImage);
+                    mSelectedImageUrl = data.getStringExtra(getString(R.string.intent_new_camera_photo));
+                }
+            }
+        }
+    }
+
+    private void checkPermissions(){
+        final boolean cameraGranted = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED;
+        final boolean storageGranted = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+
+        String[] perms = null;
+        if(cameraGranted){
+            if(storageGranted){
+                mPermissionsChecked = true;
+            } else {
+                perms = new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            }
+        } else {
+            if(!storageGranted){
+                perms = new String[] {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            } else {
+                perms = new String[] {Manifest.permission.CAMERA};
+            }
+        }
+
+        if(perms != null){
+            ActivityCompat.requestPermissions(getActivity(), perms, VERIFY_PERMISSIONS_REQUEST);
+            mPermissionsChecked = false;
         }
     }
 

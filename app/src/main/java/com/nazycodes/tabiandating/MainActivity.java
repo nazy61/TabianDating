@@ -182,6 +182,8 @@ public class MainActivity extends AppCompatActivity implements IMainActivity,
             }
         }
         setNavigationIcon(tagName);
+
+        printBackStack();
     }
 
     private void setNavigationViewListener(){
@@ -217,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity,
         if(isFirstLogin){
             Log.d(TAG, "isFirstLogin: launching alert dialog");
 
+            // launch the info dialog for first-time-users
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setMessage(getString(R.string.first_time_user_message));
             alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -224,9 +227,11 @@ public class MainActivity extends AppCompatActivity implements IMainActivity,
                 public void onClick(DialogInterface dialog, int which) {
                     Log.d(TAG, "onClick: closing dialog");
 
+                    // now that the user has logged in, save it to shared preferences so the dialog won't
+                    // pop up again
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(PreferenceKeys.FIRST_TIME_LOGIN, false);
-                    editor.apply();
+                    editor.commit();
                     dialog.dismiss();
                 }
             });
@@ -246,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity,
         }
 
         mViewProfileFragment = new ViewProfileFragment();
-
         Bundle args = new Bundle();
         args.putParcelable(getString(R.string.intent_user), user);
         mViewProfileFragment.setArguments(args);
@@ -267,7 +271,6 @@ public class MainActivity extends AppCompatActivity implements IMainActivity,
         }
 
         mChatFragment = new ChatFragment();
-
         Bundle args = new Bundle();
         args.putParcelable(getString(R.string.intent_message), message);
         mChatFragment.setArguments(args);
@@ -284,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements IMainActivity,
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
+        //Handle navigation view item clicks here
         switch (menuItem.getItemId()){
 
             case R.id.home: {
@@ -373,5 +377,12 @@ public class MainActivity extends AppCompatActivity implements IMainActivity,
         }
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    private void printBackStack(){
+        Log.d(TAG, "printBackStack: ------------------------------------- ");
+        for(int i = 0; i < mFragmentTags.size(); i++){
+            Log.d(TAG, "printBackStack: " + i + ": " + mFragmentTags.get(i));
+        }
     }
 }
